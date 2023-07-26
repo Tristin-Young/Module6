@@ -91,7 +91,7 @@ public class GUI extends Application implements EventHandler<ActionEvent>{
 	    primaryStage.show();
 
 	    map = new HashMap<String, Integer>();
-	    countEachWord("../Module 2 Assignment Input.htm", map);
+	    countEachWord("../Module6GUI/Module 2 Assignment Input.htm", map);
 	    nlist = new ArrayList<>(map.entrySet());
 	    nlist.sort(Entry.comparingByValue(Comparator.reverseOrder()));
 
