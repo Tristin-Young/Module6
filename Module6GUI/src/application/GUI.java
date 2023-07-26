@@ -47,64 +47,112 @@ public class GUI extends Application implements EventHandler<ActionEvent>{
 
 	    // Set global style for the labels, buttons and textfields
 	    String style = "-fx-font: 14 arial; -fx-base: #b6e7c9;";
-
+	    
+	    
+	    //section for components of first text box input an associated data
+	    //this text box allows a user to input a number and be shown the resulting top
+	    //words from the input file. A label 'View the top ___ words' is created. A text input
+	    //is created to capture the users input. A button is created to execute the function
+	    //The label and button are styled using the above string on line 48
 	    Label labelWord = new Label("View the top ___ words");
 	    labelWord.setStyle(style);
 	    wordInput = new TextField();
 	    wordButton = new Button("See words");
 	    wordButton.setStyle(style);
 
+	    //section for components of second text box input an associated data
+	    //this text box allows a user to input a word and be shown the resulting occurrences of that
+	    //word from the input file. A label 'Search for word: ' is created. A text input
+	    //is created to capture the users input. A button is created to execute the function
+	    //The label and button are styled using the above string on line 48
 	    Label labelSearch = new Label("Search for word: ");
 	    labelSearch.setStyle(style);
 	    TextField searchInput = new TextField();
 	    Button searchButton = new Button("Search");
 	    searchButton.setStyle(style);
 
+	    //creating a horizontal box to display the number function's label
+	    //textbox, and button all inline with eachother, in that order
 	    HBox hbox1 = new HBox(20);
 	    hbox1.getChildren().addAll(labelWord, wordInput, wordButton);
 
+	    //creating a horizontal box to display the word search's label
+	    //textbox, and button all inline with eachother, in that order
 	    HBox hbox2 = new HBox(20);
 	    hbox2.getChildren().addAll(labelSearch, searchInput, searchButton);
 
+	    //creating a main vertical box layout to put the horizontal boxes linearly
+	    //add padding to aid in aesthetics
 	    VBox mainLayout = new VBox(20);
 	    mainLayout.getChildren().addAll(hbox1, hbox2);
-	    mainLayout.setPadding(new Insets(20)); // Add some padding around the edges
+	    mainLayout.setPadding(new Insets(20));
 
+	    //creating the input scene based on the vertical box above, and set it to 600 x 400 pixels
 	    Scene wordScene = new Scene(mainLayout, 600, 400);
 
+	    //creating a return button so a user can get from an output screen to the main screen of
+	    //the GUI. Label it 'Return to Main' and style it according to line 48
 	    Button returnButton = new Button("Return to Main");
 	    returnButton.setStyle(style);
+	    //create a non-editable text area to display the results of the users query
 	    resultTextArea = new TextArea();
 	    resultTextArea.setEditable(false);
+	    //create a vertical box to hold the text and the button
 	    VBox resultLayout = new VBox(20);
 	    resultLayout.getChildren().addAll(resultTextArea, returnButton);
+	    //create the result scene to display the output of the function the user queried
 	    resultScene = new Scene(resultLayout, 600, 600);
 
+	    //when the return button is pressed, set the scene to the main scene of the GUI
+	    //Set the text fields to "", so it is blank for the user to use again
 	    returnButton.setOnAction(event -> {
 	        window.setScene(wordScene);
 	        wordInput.setText(""); // Clear the text input field
 	        searchInput.setText(""); // Clear the search input field
 	    });
 
+	    //set the primary stage to the main scene of the GUI
+	    //Give the window the title 'Word Counting GUI'
+	    //show the stage
 	    primaryStage.setScene(wordScene);
 	    primaryStage.setTitle("Word Counting GUI");
 	    primaryStage.show();
 
+	    //create a hashmap to store words and amount of occurrences in input file
 	    map = new HashMap<String, Integer>();
+	    //call countEachWord function, pass in file location and map, created above
 	    countEachWord("../Module6GUI/Module 2 Assignment Input.htm", map);
+	    //create an arrayList to hold the output of the function
 	    nlist = new ArrayList<>(map.entrySet());
+	    //sort the list by occurrences, going from greatest to least
 	    nlist.sort(Entry.comparingByValue(Comparator.reverseOrder()));
 
+	    //if the user enters a number x, we shall return them the top 'x' words with
+	    //the most occurrences in the file. When the user presses the button to query
+	    //this function
 	    wordButton.setOnAction(new EventHandler<ActionEvent>() {
 	        @Override
 	        public void handle(ActionEvent event) {
+	        	//save the input entered by the user
 	            String input = wordInput.getText();
+	            //if the input is digits only
 	            if (input.matches("\\d+")) {
+	            	//parse the number into an integer
 	                int number = Integer.parseInt(input);
+	                //create a list to hold the results
+	                //results come from the generateResults() function, pass in the number just saved
 	                List<String> res = generateResults(nlist, number);
+	                //set the text in the result area to the result list res. Separate each entry
+	                //with a new line
 	                resultTextArea.setText(String.join("\n", res));
+	                //show the user the result scene
 	                window.setScene(resultScene);
-	                wordInput.setText(""); // Clear the text input field
+	                //clear the text input field
+	                wordInput.setText(""); 
+	            
+	            //if the user input is not only digits, alert them that the input is invalid and
+	            //they need to enter a valid number. The alert will persist until the user interacts
+	            //with it
 	            } else {
 	                Alert alert = new Alert(AlertType.INFORMATION);
 	                alert.setTitle("Invalid Input");
@@ -113,16 +161,24 @@ public class GUI extends Application implements EventHandler<ActionEvent>{
 	            }
 	        }
 	    });
-
+	    
+	    //if the user enters a word, we shall return them the amount of occurrences of that word
+	    //in a given input file. When the user presses the button to query this function
 	    searchButton.setOnAction(new EventHandler<ActionEvent>() {
 	        @Override
 	        public void handle(ActionEvent event) {
+	        	//save the input by the user. Normalize it in the same way the poem was normalized
 	            String input = searchInput.getText().toLowerCase().replaceAll(",", "").replaceAll("!", "")
 	                    .replaceAll("\\.", "").replaceAll("'", "");
+	            //retrieve the amount of occurrences of the user's word in the given input file
 	            Integer wordCount = map.get(input);
+	            //if the word is not in the hashmap, return 0 because it was not in the input file at all
 	            if (wordCount == null) {
 	                wordCount = 0;
 	            }
+	            //alert the user of the result. Pass in their input and the resulting occurrence value
+	            //this scene persists until the user interacts with it
+	            //reset the textbox to be blank
 	            Alert alert = new Alert(AlertType.INFORMATION);
 	            alert.setTitle("Search Result");
 	            alert.setContentText("The word \"" + input + "\" appears " + wordCount + " times.");
@@ -200,10 +256,6 @@ public class GUI extends Application implements EventHandler<ActionEvent>{
 				results.add(i+1 + ": " + list.get(i));
 			}
 			return results;
-		}
-		
-		static void searchResults(List <Entry<String, Integer>> list, String search) {
-			
 		}
 
 		@Override
