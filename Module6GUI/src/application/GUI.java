@@ -168,8 +168,8 @@ public class GUI extends Application implements EventHandler<ActionEvent>{
 	        @Override
 	        public void handle(ActionEvent event) {
 	        	//save the input by the user. Normalize it in the same way the poem was normalized
-	            String input = searchInput.getText().toLowerCase().replaceAll(",", "").replaceAll("!", "")
-	                    .replaceAll("\\.", "").replaceAll("'", "");
+	            String input = searchInput.getText();
+	            input = normalizeString(input);
 	            //retrieve the amount of occurrences of the user's word in the given input file
 	            Integer wordCount = map.get(input);
 	            //if the word is not in the hashmap, return 0 because it was not in the input file at all
@@ -187,7 +187,7 @@ public class GUI extends Application implements EventHandler<ActionEvent>{
 	        }
 	    });
 	}
-	
+
 	
 	//function to take an input file location, and index the occurrence of the words
 	//in the document. The method takes in a HTML file and only parses words inside 
@@ -206,8 +206,7 @@ public class GUI extends Application implements EventHandler<ActionEvent>{
 		//coercion
 		//remove any capitalization as well as special chars !.,'
 		word = file.next().toLowerCase();
-		word = word.replaceAll(",", "").replaceAll("!", "")
-		.replaceAll("\\.", "").replaceAll("'", "");
+		word = normalizeString(word);
 		//if the word contains chars that make it an HTML tag
 		if(word.contains("<") || word.contains(">") || word.contains("/")
 		|| word.contains(":") || word.contains("&")
@@ -273,6 +272,12 @@ public class GUI extends Application implements EventHandler<ActionEvent>{
 			return results;
 		}
 
+		static String normalizeString(String input) {
+			String result = input.toLowerCase().replaceAll(",", "").replaceAll("!", "")
+	                .replaceAll("\\.", "").replaceAll("'", "");
+			return result;
+		}
+		
 		@Override
 		public void handle(ActionEvent arg0) {
 			// TODO Auto-generated method stub

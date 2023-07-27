@@ -14,19 +14,12 @@ import org.junit.jupiter.api.Test;
 
 class GUITest {
 
+	//begin test
 	@Test
 	void testStart() {
 		System.out.println("Running JUnit tests.");
 	}
 
-	//verify text resets after return button is pressed
-//	@Test
-//	void verifyNumTextReset() {
-//		GUI gui = new GUI();
-//		
-//	}
-
-	
 	//verify the countEachWord() function is returning the proper amount of occurrences 
 	//in the given input file. This is the most crucial part of the program, as the GUI 
 	//actively uses this program the most
@@ -60,8 +53,7 @@ class GUITest {
 		assertEquals(expectedRes5, result5);
 		
 	}
-	
-	
+		
 	//verify generateResults functions properly
 	//this test is to mainly ensure that generateResults() returns the correct
 	//amount of items in the list
@@ -80,7 +72,6 @@ class GUITest {
 		}
 	}
 
-	
 	//verify digits are only present in given input string
 	@Test
 	void verifyDigitValidation() {
@@ -110,10 +101,36 @@ class GUITest {
 		assertEquals(expected5, result5);
 	}
 	
-	
 	//verify normalization of input works
-
+	@Test
+	void verifyNormalizeString() {
+		
+		String input1 = "HoWdy,";
+		String input2 = "the.";
+		String input3 = "!and";
+		String input4 = "raven,";
+		String input5 = "'cold'";
+		
+		String expectedRes1 = "howdy";
+		String expectedRes2 = "the";
+		String expectedRes3 = "and";
+		String expectedRes4 = "raven";
+		String expectedRes5 = "cold";
+		
+		String result1 = GUI.normalizeString(input1);
+		String result2 = GUI.normalizeString(input2);
+		String result3 = GUI.normalizeString(input3);
+		String result4 = GUI.normalizeString(input4);
+		String result5 = GUI.normalizeString(input5);
+		
+		assertEquals(expectedRes1, result1);
+		assertEquals(expectedRes2, result2);
+		assertEquals(expectedRes3, result3);
+		assertEquals(expectedRes4, result4);
+		assertEquals(expectedRes5, result5);
+	}
 	
+	//test concluded
 	@Test
 	void testFinish() {
 		System.out.println("JUnit Tests competed.");
