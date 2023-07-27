@@ -136,7 +136,7 @@ public class GUI extends Application implements EventHandler<ActionEvent>{
 	        	//save the input entered by the user
 	            String input = wordInput.getText();
 	            //if the input is digits only
-	            if (input.matches("\\d+")) {
+	            if (verifyDigits(input)) {
 	            	//parse the number into an integer
 	                int number = Integer.parseInt(input);
 	                //create a list to hold the results
@@ -189,7 +189,9 @@ public class GUI extends Application implements EventHandler<ActionEvent>{
 	}
 	
 	
-	
+	//function to take an input file location, and index the occurrence of the words
+	//in the document. The method takes in a HTML file and only parses words inside 
+	//paragraph tags
 	static void countEachWord(String fileName, Map<String, Integer> words) throws FileNotFoundException {
 		//read in file
 		Scanner file = new Scanner(new File(fileName));
@@ -250,6 +252,19 @@ public class GUI extends Application implements EventHandler<ActionEvent>{
 		}
 		}
 		
+		//function to verify if input string is only digits or not
+		boolean verifyDigits(String numberstr) {
+			if (numberstr.matches("\\d+")) {
+				return true;
+			}
+			else {
+				return false;
+			}
+			
+		}
+		
+		//function to take list and return a list of length 'amount' in the format
+		// '1: the=58' , '2: and=38' , etc.
 		static List<String> generateResults(List<Entry<String, Integer>> list, int amount) {
 			List<String> results = new ArrayList<>();
 			for (int i = 0; i < amount; i++) {
