@@ -18,12 +18,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
+import java.util.stream.Collectors;
+
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
 import javafx.geometry.Insets;
-
+import java.sql.*;
 /**
  * This class is an example of a GUI. The class utilizes JavaFX
  * to present the user with a GUI. The GUI will allow the user to query
@@ -175,9 +177,12 @@ public class GUI extends Application implements EventHandler<ActionEvent>{
 	    //create a hashmap to store words and amount of occurrences in input file
 	    map = new HashMap<String, Integer>();
 	    //call countEachWord function, pass in file location and map, created above
-	    countEachWord("../Module6GUI/Module 2 Assignment Input.htm", map);
+	    countEachWord("../Module6GUI/Module 2 Assignment Input.htm");
 	    //create an arrayList to hold the output of the function
 	    nlist = new ArrayList<>(map.entrySet());
+	    nlist = nlist.stream()
+	             .filter(e -> e.getValue() != null)
+	             .collect(Collectors.toList());
 	    //sort the list by occurrences, going from greatest to least
 	    nlist.sort(Entry.comparingByValue(Comparator.reverseOrder()));
 
@@ -193,17 +198,23 @@ public class GUI extends Application implements EventHandler<ActionEvent>{
 	            if (verifyDigits(input)) {
 	            	//parse the number into an integer
 	                int number = Integer.parseInt(input);
-	                //create a list to hold the results
-	                //results come from the generateResults() function, pass in the number just saved
-	                List<String> res = generateResults(nlist, number);
-	                //set the text in the result area to the result list res. Separate each entry
-	                //with a new line
-	                resultTextArea.setText(String.join("\n", res));
-	                //show the user the result scene
-	                window.setScene(resultScene);
-	                //clear the text input field
-	                wordInput.setText(""); 
-	            
+	            	try {
+	            		//create a list to hold the results
+		                //results come from the generateResults() function, pass in the number just saved
+		                List<String> res = generateResults(number);
+		                //set the text in the result area to the result list res. Separate each entry
+		                //with a new line
+		                resultTextArea.setText(String.join("\n", res));
+		                //show the user the result scene
+		                window.setScene(resultScene);
+		                //clear the text input field
+		                wordInput.setText(""); 
+	            	}catch(SQLException e){
+	                    Alert alert = new Alert(AlertType.ERROR);
+	                    alert.setTitle("DB Error");
+	                    alert.setContentText("A problem occurred while fetching word count data from the database");
+	                    alert.showAndWait();
+	            	}
 	            //if the user input is not only digits, alert them that the input is invalid and
 	            //they need to enter a valid number. The alert will persist until the user interacts
 	            //with it
@@ -224,20 +235,34 @@ public class GUI extends Application implements EventHandler<ActionEvent>{
 	        	//save the input by the user. Normalize it in the same way the poem was normalized
 	            String input = searchInput.getText();
 	            input = normalizeString(input);
-	            //retrieve the amount of occurrences of the user's word in the given input file
-	            Integer wordCount = map.get(input);
-	            //if the word is not in the hashmap, return 0 because it was not in the input file at all
-	            if (wordCount == null) {
-	                wordCount = 0;
+	            try {
+	            	Connection conn = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/sd1", "root", "password");
+	        		Statement stmt = conn.createStatement();
+	        		ResultSet res = stmt.executeQuery("SELECT count FROM sd1.wordcounts WHERE word = '" + input + "'");
+		            //retrieve the amount of occurrences of the user's word in the given input file
+		            Integer wordCount = 0;
+		            if(res.next()) {
+		            	wordCount = res.getInt("count");
+		            }
+		            
+		            conn.close();
+		            stmt.close();
+		            res.close();
+
+		            //alert the user of the result. Pass in their input and the resulting occurrence value
+		            //this scene persists until the user interacts with it
+		            //reset the textbox to be blank
+		            Alert alert = new Alert(AlertType.INFORMATION);
+		            alert.setTitle("Search Result");
+		            alert.setContentText("The word \"" + input + "\" appears " + wordCount + " times.");
+		            alert.showAndWait();
+		            searchInput.setText(""); // Clear the search input field
+		            
+	            }catch(SQLException e) {
+	            	e.printStackTrace();
 	            }
-	            //alert the user of the result. Pass in their input and the resulting occurrence value
-	            //this scene persists until the user interacts with it
-	            //reset the textbox to be blank
-	            Alert alert = new Alert(AlertType.INFORMATION);
-	            alert.setTitle("Search Result");
-	            alert.setContentText("The word \"" + input + "\" appears " + wordCount + " times.");
-	            alert.showAndWait();
-	            searchInput.setText(""); // Clear the search input field
+
+	            
 	        }
 	    });
 	}
@@ -255,54 +280,64 @@ public class GUI extends Application implements EventHandler<ActionEvent>{
 	 * @param words The hashmap that is to be updated with the output of countEachWord().
 	 * @throws FileNotFoundException If the file location cannot be reached, throw an exception and halt the program.
 	 */
-	static void countEachWord(String fileName, Map<String, Integer> words) throws FileNotFoundException {
-		//read in file
-		Scanner file = new Scanner(new File(fileName));
-		//while we are not at the end of the file
-		while(file.hasNext()) {
-		//set word to lowercase
-		String word = file.next().toLowerCase();
-		//if the word is a paragraph tag <p>
-		if(word.contentEquals("<p>")) {
-		//while we are not at the closing paragraph tag </p>
-		do {
-		//coercion
-		//remove any capitalization as well as special chars !.,'
-		word = file.next().toLowerCase();
-		word = normalizeString(word);
-		//if the word contains chars that make it an HTML tag
-		if(word.contains("<") || word.contains(">") || word.contains("/")
-		|| word.contains(":") || word.contains("&")
-		|| word.contains("“") || word.contains("“")) {
-		//skip the word
-		continue;
-		}
-		//otherwise get the current count from the map
-		Integer count = words.get(word);
-		//if the count exists, increment it
-		if(count != null)
-		{
-		count++;
-		}
-		//otherwise create count and set it to 1
-		else {
-		count = 1;
-		}
-		//save the new count into the map so long as the word != </p>
-		if(!word.contentEquals("</p>")) {
-		words.put(word, count);
-		}
+	static void countEachWord(String fileName) throws FileNotFoundException, SQLException {
+	    // Establish a connection to the MySQL database.
+	    Connection conn = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/sd1", "root", "password");
+		
+	    // Read in file
+	    Scanner file = new Scanner(new File(fileName));
+	    
+	    // While we are not at the end of the file
+	    while(file.hasNext()) {
+	        // Set word to lowercase
+	        String word = file.next().toLowerCase();
+			
+	        // If the word is a paragraph tag <p>
+	        if(word.contentEquals("<p>")) {
+	            // While we are not at the closing paragraph tag </p>
+	            do {
+	                // Coercion: remove any capitalization as well as special chars !.,'
+	                word = file.next().toLowerCase();
+	                word = normalizeString(word);
+					
+	                // If the word contains chars that make it an HTML tag
+	                if(word.contains("<") || word.contains(">") || word.contains("/") || word.contains(":") || word.contains("&")
+	                    || word.contains("“") || word.contains("“")) {
+	                    // Skip the word
+	                    continue;
+	                }
+					
+	                // Use a PreparedStatement to ensure proper SQL syntax and prevent SQL injection
+	                PreparedStatement ps = conn.prepareStatement("SELECT count FROM sd1.wordcounts WHERE word = ?");
+	                ps.setString(1, word);
+	                ResultSet sqlOutput = ps.executeQuery();
 
-		}while(!word.contentEquals("</p>"));
-
-		}
-
-
-
-		}
-		//close the file
-		file.close();
-		}
+	                int count = 0;
+	                if(sqlOutput.next()) {
+	                    // If the word is in the database, increment its count
+	                    count = sqlOutput.getInt("count");
+	                    String sql = "UPDATE sd1.wordcounts SET count = ? WHERE word = ?";
+	                    PreparedStatement psUpdate = conn.prepareStatement(sql);
+	                    psUpdate.setInt(1, count+1);
+	                    psUpdate.setString(2, word);
+	                    psUpdate.executeUpdate();
+	                } else {
+	                    // If the word is not in the database, add it with a count of 1
+	                    count = 1;
+	                    String sql = "INSERT INTO sd1.wordcounts (word, count) VALUES (?, ?)";
+	                    PreparedStatement psInsert = conn.prepareStatement(sql);
+	                    psInsert.setString(1, word);
+	                    psInsert.setInt(2, count);
+	                    psInsert.executeUpdate();
+	                }
+	            } while(!word.contentEquals("</p>"));
+	        }
+	    }
+	    // Close the file
+	    file.close();
+	    // Close the connection to the database
+	    conn.close();
+	}
 
 		//helper function to print the results of the map
 	/**
@@ -346,11 +381,22 @@ public class GUI extends Application implements EventHandler<ActionEvent>{
 		 * @param amount The amount of items desired in the returning list
 		 * @return Returns a list of type (String). Each string in the returning list has format "index: word=occurrences".
 		 */
-		static List<String> generateResults(List<Entry<String, Integer>> list, int amount) {
+		static List<String> generateResults(int amount)throws SQLException {
 			List<String> results = new ArrayList<>();
-			for (int i = 0; i < amount; i++) {
-				results.add(i+1 + ": " + list.get(i));
+			Connection conn = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/sd1", "root", "password");
+			Statement stmt = conn.createStatement();
+			ResultSet res = stmt.executeQuery("SELECT * FROM sd1.wordcounts ORDER BY count DESC LIMIT " + amount);
+			
+			while(res.next()) {
+				String word = res.getString("word");
+				int count = res.getInt("count");
+				results.add(word + ": " + count);
 			}
+			
+			conn.close();
+			stmt.close();
+			res.close();
+			
 			return results;
 		}
 
