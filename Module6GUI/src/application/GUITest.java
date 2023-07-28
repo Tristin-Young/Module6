@@ -12,9 +12,22 @@ import java.util.Map.Entry;
 
 import org.junit.jupiter.api.Test;
 
+/**
+ * This is a basic JUnit test suite to test the GUI class. The GUI has two basic functions,
+ * returning the most commonly used words from a given HTML file, or returning the amount of 
+ * times a given string occurred in a given HTML file. These test aim to ensure the functionality
+ * of the logic in the program.
+ * @author Tristin Young
+ * @version 20230728
+ *
+ */
 class GUITest {
 
 	//begin test
+	/**
+	 * Test that prints to the console notifying developer that the
+	 * JUnit unit tests have started (will never fail).
+	 */
 	@Test
 	void testStart() {
 		System.out.println("Running JUnit tests.");
@@ -23,6 +36,14 @@ class GUITest {
 	//verify the countEachWord() function is returning the proper amount of occurrences 
 	//in the given input file. This is the most crucial part of the program, as the GUI 
 	//actively uses this program the most
+	/**
+	 * Test case to ensure that the method countEachWord() is functioning properly. 
+	 * Five input strings are passed in as parameters to the map.get() method after 
+	 * countEachWord() has executed. The result from map.get() is captured and compared to the expected output using the 
+	 *  assertEquals() method.
+	 *  @throws FileNotFoundException If the file path cannot be located, the program will halt with 
+	 *   an exception error.
+	 */
 	@Test
 	void verifyCountEachWord() throws FileNotFoundException {
 		//GUI gui = new GUI();
@@ -57,6 +78,15 @@ class GUITest {
 	//verify generateResults functions properly
 	//this test is to mainly ensure that generateResults() returns the correct
 	//amount of items in the list
+	/**
+	 * Test case to ensure that the method generateResults() is functioning properly.
+	 *  For the length of a given list, iterate through the list and call generateResults
+	 *  (list, current iteration). This will produce every possible output to generateResults().
+	 *   The length of the list that is passed as output can be compared to the current iteration.
+	 *   If they match, the test case passed. 
+	 *   @throws FileNotFoundException If the file path cannot be located, the program will halt with 
+	 *   an exception error.
+	 */
 	@Test
 	void verifyGenerateResults() throws FileNotFoundException {
 		//GUI gui = new GUI();
@@ -73,6 +103,12 @@ class GUITest {
 	}
 
 	//verify digits are only present in given input string
+	/**
+	 * Test case to ensure that the method verifyDigits() is functioning properly. 
+	 * Five input strings are passed in as parameters to verifyDigits(). The result
+	 *  from verifyDigits() is captured and compared to the expected output using the 
+	 *  assertEquals() method.
+	 */
 	@Test
 	void verifyDigitValidation() {
 		GUI gui = new GUI();
@@ -102,6 +138,12 @@ class GUITest {
 	}
 	
 	//verify normalization of input works
+	/**
+	 * Test case to ensure that the method normalizeString() is functioning properly. 
+	 * Five input strings are passed in as parameters to normalizeString(). The result
+	 *  from normalizeString() is captured and compared to the expected output using the 
+	 *  assertEquals() method.
+	 */
 	@Test
 	void verifyNormalizeString() {
 		
@@ -131,6 +173,10 @@ class GUITest {
 	}
 	
 	//test concluded
+	/**
+	 * Test that prints to the console notifying developer that the
+	 * JUnit unit tests have all ran (will never fail).
+	 */
 	@Test
 	void testFinish() {
 		System.out.println("JUnit Tests competed.");

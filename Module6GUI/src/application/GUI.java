@@ -24,24 +24,78 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
 import javafx.geometry.Insets;
 
+/**
+ * This class is an example of a GUI. The class utilizes JavaFX
+ * to present the user with a GUI. The GUI will allow the user to query
+ * Edgar Allen Poe's "The Raven" to find information about the words and the amount of times they
+ * occur inside the file. More specifically, the GUI class allows a user to interact with
+ * any HTML file in the same way as described above, however currently the file is pointed towards
+ * Poe's poem.
+ * 
+ * @author Tristin Young
+ * @version 20230728
+ * 
+ */
 public class GUI extends Application implements EventHandler<ActionEvent>{
 	
+	/**
+	 * Alias for JavaFX's default primaryStage
+	 */
 	Stage window;
-	Scene scene1, scene2;
-	Button button1, button2, wordButton;
+	/**
+	 * This button runs the query that returns the top 'x' words that occurred in the file. The amount of
+	 * words returned to the user is dictated by wordInput
+	 */
+	Button wordButton;
+	/**
+	 * This text box takes an integer. This text box should receive an integer and pass it into the query that returns
+	 * the top 'x' words that occurred in the file. In this example, 'x' would be the number that the user entered.
+	 */
 	TextField wordInput;
+	/**
+	 * List is created to store an ordered version of the hashmap once the file has been fully parsed.
+	 */
 	List <Entry<String, Integer>> nlist;  
+	/**
+	 * Map is a hashmap that takes a string and an integer. The purpose of the map is to keep the words and 
+	 * their amount of occurrences in pairs. The map is updated when the countEachWord() function is called.
+	 */
 	Map<String, Integer> map;
-	Scene resultScene, searchResultScene;
-	TextArea resultTextArea, searchResultTextArea;
-	
-	
+	/**
+	 * This is the scene the user will see when they have chosen to execute the query that returns the top 'x'
+	 * words based on how frequently they occurred in the input file. The scene will display the resultTextArea as well
+	 * as a resultButton.
+	 */
+	Scene resultScene;
+	/**
+	 * This is the scene the user will see when they have chosen to execute the query that returns amount of times a given
+	 * input string occurs in the input file. The scene will display the SearchesultTextArea as well as a resultButton.
+	 * as a resultButton.
+	 */
+	Scene searchResultScene;
+	/**
+	 * This is a non-editable text area that is to be meant for the resultScene. It will be populated with the top 'x' words
+	 * based on frequency in the file, where x is a user given number.
+	 */
+	TextArea resultTextArea;
+	/**
+	 * This is a non-editable text area that is meant for the searchResultScene. It will be populated with "The word 'inputString'
+	 * occurs 'x' times, where inputString is the string input by the user, and x is the number of times the given string occurred 
+	 * in the file.
+	 */
+	TextArea searchResultTextArea;
+	/**
+	 * The main method is used to call the launch() function, which is vital to all JavaFX projects.
+	 * The launch method is a built in JavFX method and, in turn, calls the start method.
+	 * @param args args is the default main method argument
+	 */
 	public static void main(String[] args) {
 		launch(args);
 	}
 		
 	@Override
 	public void start(Stage primaryStage) throws Exception {
+		
 	    window = primaryStage;
 	    window.setTitle("Word Counting GUI");
 
@@ -192,6 +246,15 @@ public class GUI extends Application implements EventHandler<ActionEvent>{
 	//function to take an input file location, and index the occurrence of the words
 	//in the document. The method takes in a HTML file and only parses words inside 
 	//paragraph tags
+	/**
+	 * This function takes in an HTML file location, and parses the words in between paragraph tags.
+	 * There is normalization of the words (all lowercase, punctuation removed). Once a word is parsed, it gets added
+	 * to a hashmap where each word is tracked along with the amount of times that word has occurred inside the given
+	 * input file. The method will throw an exception if the file location cannot be reached.
+	 * @param fileName The filepath of the desired HTML file.
+	 * @param words The hashmap that is to be updated with the output of countEachWord().
+	 * @throws FileNotFoundException If the file location cannot be reached, throw an exception and halt the program.
+	 */
 	static void countEachWord(String fileName, Map<String, Integer> words) throws FileNotFoundException {
 		//read in file
 		Scanner file = new Scanner(new File(fileName));
@@ -242,6 +305,11 @@ public class GUI extends Application implements EventHandler<ActionEvent>{
 		}
 
 		//helper function to print the results of the map
+	/**
+	 * Helper function to print the results of the method to the console.
+	 * @param list Takes in a sorted list of type (String, Integer). List is sorted by Integer, greatest to least.
+	 * @param amount The amount of word-occurrence pairs desired to be printed to the console
+	 */
 		static void printResults(List <Entry<String, Integer>> list, int amount) {
 		//for loop to iterate over items
 		for(int i = 0; i < amount; i++)
@@ -252,6 +320,12 @@ public class GUI extends Application implements EventHandler<ActionEvent>{
 		}
 		
 		//function to verify if input string is only digits or not
+		/**
+		 * Function that takes a string as input and returns a boolean depending on if the string is a number or not (numerical number).
+		 * The function will return false if the string contains anything other than digits; only digits will return a value of true.
+		 * @param numberstr The string to be verified. 
+		 * @return Boolean return, true if the string is all digits, false otherwise.
+		 */
 		boolean verifyDigits(String numberstr) {
 			if (numberstr.matches("\\d+")) {
 				return true;
@@ -264,6 +338,14 @@ public class GUI extends Application implements EventHandler<ActionEvent>{
 		
 		//function to take list and return a list of length 'amount' in the format
 		// '1: the=58' , '2: and=38' , etc.
+		/**
+		 * Takes in a list and an integer. The list is already sorted. Loop through the list,
+		 * appending each items to a results list. When the loop index is equal to the integer parameter,
+		 * return the results list.
+		 * @param list A list of type (String, Integer) that is sorted by the integer from greatest to least
+		 * @param amount The amount of items desired in the returning list
+		 * @return Returns a list of type (String). Each string in the returning list has format "index: word=occurrences".
+		 */
 		static List<String> generateResults(List<Entry<String, Integer>> list, int amount) {
 			List<String> results = new ArrayList<>();
 			for (int i = 0; i < amount; i++) {
@@ -272,12 +354,21 @@ public class GUI extends Application implements EventHandler<ActionEvent>{
 			return results;
 		}
 
+		/**
+		 * Method to normalize a string (within reason). Method takes an input string and removes all punctuation and sets 
+		 * all characters to lowercase.
+		 * @param input The string to be normalized
+		 * @return Returnsn the same string, without punctuation and all lowercase letters
+		 */
 		static String normalizeString(String input) {
 			String result = input.toLowerCase().replaceAll(",", "").replaceAll("!", "")
 	                .replaceAll("\\.", "").replaceAll("'", "");
 			return result;
 		}
 		
+		/**
+		 * Auto generated method required by JavaFX
+		 */
 		@Override
 		public void handle(ActionEvent arg0) {
 			// TODO Auto-generated method stub
