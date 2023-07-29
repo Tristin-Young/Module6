@@ -284,6 +284,20 @@ public class GUI extends Application implements EventHandler<ActionEvent>{
 	    // Establish a connection to the MySQL database.
 	    Connection conn = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/sd1", "root", "password");
 		
+	    // Check if the indexing flag is set in the database
+	    PreparedStatement psFlagCheck = conn.prepareStatement("SELECT flag FROM sd1.indexflag WHERE id = 1");
+	    ResultSet flagResult = psFlagCheck.executeQuery();
+		
+	    boolean indexingFlag = false;
+	    if(flagResult.next()) {
+	        indexingFlag = flagResult.getBoolean("flag");
+	    }
+		
+	    // If indexing has been done before, return without doing anything
+	    if(indexingFlag) {
+	        return;
+	    }
+	    
 	    // Read in file
 	    Scanner file = new Scanner(new File(fileName));
 	    
@@ -332,6 +346,8 @@ public class GUI extends Application implements EventHandler<ActionEvent>{
 	                }
 	            } while(!word.contentEquals("</p>"));
 	        }
+	        PreparedStatement psFlagSet = conn.prepareStatement("UPDATE sd1.indexflag SET flag = true WHERE id = 1");
+	        psFlagSet.executeUpdate();
 	    }
 	    // Close the file
 	    file.close();

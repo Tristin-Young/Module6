@@ -47,36 +47,36 @@ class GUITest {
 	 *   an exception error.
 	 * @throws SQLException 
 	 */
-//	@Test
-//	void verifyCountEachWord() throws FileNotFoundException, SQLException {
-//		//GUI gui = new GUI();
-//		Map<String, Integer> map = new HashMap<String, Integer>();
-//		GUI.countEachWord("../Module6GUI/Module 2 Assignment Input.htm");
-//		String input1 = "howdy";
-//		String input2 = "the";
-//		String input3 = "and";
-//		String input4 = "raven";
-//		String input5 = "cold";
-//		
-//		Integer expectedRes1 = 0;
-//		Integer expectedRes2 = 56;
-//		Integer expectedRes3 = 38;
-//		Integer expectedRes4 = 10;
-//		Integer expectedRes5 = 0;
-//		
-//		Integer result1 = ((result1 = map.get(input1)) != null) ? result1 : 0;
-//		Integer result2 = ((result2 = map.get(input2)) != null) ? result2 : 0;
-//		Integer result3 = ((result3 = map.get(input3)) != null) ? result3 : 0;
-//		Integer result4 = ((result4 = map.get(input4)) != null) ? result4 : 0;
-//		Integer result5 = ((result5 = map.get(input5)) != null) ? result5 : 0;
-//		
-//		assertEquals(expectedRes1, result1);
-//		assertEquals(expectedRes2, result2);
-//		assertEquals(expectedRes3, result3);
-//		assertEquals(expectedRes4, result4);
-//		assertEquals(expectedRes5, result5);
-//		
-//	}
+	@Test
+	void verifyCountEachWord() throws FileNotFoundException, SQLException {
+		//GUI gui = new GUI();
+		Map<String, Integer> map = new HashMap<String, Integer>();
+		GUI.countEachWord("../Module6GUI/Module 2 Assignment Input.htm");
+		String input1 = "howdy";
+		String input2 = "the";
+		String input3 = "and";
+		String input4 = "raven";
+		String input5 = "cold";
+		
+		Integer expectedRes1 = 0;
+		Integer expectedRes2 = 56;
+		Integer expectedRes3 = 38;
+		Integer expectedRes4 = 10;
+		Integer expectedRes5 = 0;
+		
+		Integer result1 = ((result1 = map.get(input1)) != null) ? result1 : 0;
+		Integer result2 = ((result2 = map.get(input2)) != null) ? result2 : 0;
+		Integer result3 = ((result3 = map.get(input3)) != null) ? result3 : 0;
+		Integer result4 = ((result4 = map.get(input4)) != null) ? result4 : 0;
+		Integer result5 = ((result5 = map.get(input5)) != null) ? result5 : 0;
+		
+		assertEquals(expectedRes1, result1);
+		assertEquals(expectedRes2, result2);
+		assertEquals(expectedRes3, result3);
+		assertEquals(expectedRes4, result4);
+		assertEquals(expectedRes5, result5);
+		
+	}
 		
 	//verify generateResults functions properly
 	//this test is to mainly ensure that generateResults() returns the correct
